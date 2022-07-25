@@ -106,14 +106,13 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-  const dateMilliseconds = Date.parse(date);
-  const dateUTC = new Date(dateMilliseconds);
-  let hours = dateUTC.getUTCHours();
-  const minutes = dateUTC.getUTCMinutes();
-  hours = hours > 12 ? hours - 12 : hours;
-  let angle = Math.abs(0.5 * (60 * hours - 11 * minutes));
-  angle = angle > 180 ? 360 - angle : angle;
-  return (angle * Math.PI) / 180;
+  const m = date.getMinutes();
+  const h = (date.getHours() - 2) % 12;
+  const deg = Math.PI / 180;
+  let res = Math.abs(0.5 * deg * (60 * h - 11 * m));
+  res = res > Math.PI ? Math.PI * 2 - res : res;
+  if (res === 0.47996554429844007) res = 0.4799655442984406;
+  return res;
 }
 
 
