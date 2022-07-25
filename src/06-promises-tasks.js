@@ -28,8 +28,22 @@
  *      .catch((error) => console.log(error.message)) // 'Error: Wrong parameter is passed!
  *                                                    //  Ask her again.';
  */
-function willYouMarryMe(/* isPositiveAnswer */) {
-  throw new Error('Not implemented');
+function willYouMarryMe(isPositiveAnswer) {
+  if (typeof isPositiveAnswer === 'boolean') {
+    if (isPositiveAnswer) {
+      return new Promise((resolve) => {
+        resolve('Hooray!!! She said "Yes"!');
+      });
+    }
+    if (!isPositiveAnswer) {
+      return new Promise((resolve) => {
+        resolve('Oh no, she said "No".');
+      });
+    }
+  }
+  return new Promise((resolve, reject) => {
+    reject(new Error('Wrong parameter is passed! Ask her again.'));
+  });
 }
 
 
@@ -48,8 +62,8 @@ function willYouMarryMe(/* isPositiveAnswer */) {
  *    })
  *
  */
-function processAllPromises(/* array */) {
-  throw new Error('Not implemented');
+function processAllPromises(array) {
+  return Promise.all(array);
 }
 
 /**
@@ -71,8 +85,8 @@ function processAllPromises(/* array */) {
  *    })
  *
  */
-function getFastestPromise(/* array */) {
-  throw new Error('Not implemented');
+function getFastestPromise(array) {
+  return Promise.race(array);
 }
 
 /**
@@ -92,8 +106,50 @@ function getFastestPromise(/* array */) {
  *    });
  *
  */
-function chainPromises(/* array, action */) {
-  throw new Error('Not implemented');
+function chainPromises(array, action) {
+  function myMethod(taskList) {
+  // to store results
+    const results = [];
+
+    // to track how many promises have completed
+    let promisesCompleted = 0;
+
+    // return new promise
+    return new Promise((resolve, reject) => {
+      taskList.forEach((promise, index) => {
+        // if promise passes
+        promise.then((val) => {
+        // store its outcome and increment the count
+          results[index] = val;
+          promisesCompleted += 1;
+
+          // if all the promises are completed,
+          // resolve and return the result
+          if (promisesCompleted === taskList.length) {
+            resolve(results);
+          }
+        })
+        // if any promise fails, reject.
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    });
+  }
+  function MySettled(promises) {
+    const mappedPromises = promises.map((p) => p
+      .then((value) => value)
+      .catch((reason) => reason));
+    return myMethod(mappedPromises);
+  }
+  const p = MySettled(array);
+  return p.then((arr) => {
+    let res = arr[0];
+    for (let i = 1; i < arr.length; i += 1) {
+      res = action(res, arr[i]);
+    }
+    return res;
+  });
 }
 
 module.exports = {
